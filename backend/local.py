@@ -57,6 +57,33 @@ EVENTS_PUSH_BACKEND_OPTIONS = {"url": "amqp://%s:%s@%s:5672/%s" % (env("RABBITMQ
 # see celery_local.py
 CELERY_ENABLED = True
 
+if len(env('TAIGA_BACKUP_DIR', cast=str, default='')):
+    print("Enable backup")
+    INSTALLED_APPS += ["dbbackup"]
+    INSTALLED_APPS += ["django_cron"]
+    DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    DBBACKUP_STORAGE_OPTIONS = {'location': env('TAIGA_BACKUP_DIR', cast=str, default='') }
+#
+#    import os
+#    import ast
+#    from django.core import management
+#    from django.conf import settings
+#    from django_cron import CronJobBase, Schedule
+#
+#    class Backup(CronJobBase):
+#        RUN_AT_TIMES = ast.literal_eval(env('TAIGA_BACKUP_TIMES', cast=str, default="['22:45']"))
+#        print("RUN_AT_TIMES: <<%s>>" % RUN_AT_TIMES)
+#        schedule = Schedule(run_at_times=RUN_AT_TIMES)
+#        code = 'taiga.Backup'
+#
+#        def do(self):
+#            print("\n************** Do backup ***********************\n")
+#            management.call_command('dbbackup', '-z')
+#            management.call_command('mediabackup', '-z')
+#    CRON_CLASSES = [
+#        "taiga.Backup"
+#    ]
+
 if len(env('GOOGLE_API_CLIENT_ID', cast=str, default='')):
         INSTALLED_APPS += ["taiga_contrib_google_auth"]
 

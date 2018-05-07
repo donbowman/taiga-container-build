@@ -41,5 +41,36 @@ if [ ! -d /taiga_backend/static-root/admin ]; then
   python3 /taiga_backend/manage.py collectstatic --noinput
 fi
 
+pmc() {
+    TAIGA_BACKUP_TIME=${TAIGA_BACKUP_TIME:-23:10}
+    if [ ! -z "$TAIGA_BACKUP_DIR" ]
+    then
+        while true
+        do
+            now=$(date +%s)
+            target=$(date -d $TAIGA_BACKUP_TIME +%s)
+            ts=$((target - now))
+            ots=$ts
+            if [ $ts -lt 0 ]
+            then
+                ts=1
+            fi
+            echo "Sleep $ts seconds before next backup"
+            sleep $ts
+            python3 manage.py dbbackup -z
+            python3 manage.py mediabackup -z
+            # Now sleep less than 1 day and let above catch it up
+            nd=86000
+            if [ $ots -lt 0 ]
+            then
+                nd=$((nd + ots))
+            fi
+            echo "sleep $nd seconds until tomorrow"
+            sleep $nd
+        done
+    fi
+}
+
+pmc &
 echo "Start $@"
 exec "$@"

@@ -40,8 +40,8 @@ services:
       - environment
     user: taiga
     entrypoint: ['/scripts/entrypoint.sh']
-    command: ['gunicorn', '-b', '0.0.0.0:8000', '--access-logfile','-','--access-logfile','-', 'taiga.wsgi']
-    # command: [ 'python3', 'manage.py', 'runserver', '0:8000' ]
+    #command: ['gunicorn', '-b', '0.0.0.0:8000', '--access-logfile','-','--access-logfile','-', 'taiga.wsgi']
+    command: [ 'python3', 'manage.py', 'runserver', '0:8000' ]
 
   frontend:
     build: frontend/
@@ -64,6 +64,8 @@ services:
     image: ${TAIGA_CONTAINER_REGISTRY}taiga_celeryworker
     env_file:
       - environment
+    environment:
+        - TAIGA_BACKUP_DIR=
     container_name: taiga_celeryworker
     hostname: celerworker
     entrypoint: []

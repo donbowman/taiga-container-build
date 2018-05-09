@@ -12,6 +12,7 @@ COPY scripts/ /scripts/
 ADD https://github.com/taigaio/taiga-events/archive/${TAIGA_VERSION}.tar.gz /taiga_events/
 RUN tar -xzf ${TAIGA_VERSION}.tar.gz -C ./ taiga-events-master/ --strip-components=1 \
     && rm ${TAIGA_VERSION}.tar.gz \
+    && npm i npm@latest -g \
     && npm install --production && npm install -g coffee-script \
     && addgroup -S taiga && adduser --gecos "" -S -G taiga taiga \
     && chown -R taiga /taiga_events \

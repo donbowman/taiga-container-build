@@ -22,8 +22,8 @@ build:
   script:
   - echo Start build
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-  - docker-compose build
-  - docker-compose push
+  - /usr/local/bin/docker-compose build
+  - /usr/local/bin/docker-compose push
 #  - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/taiga_backend
 #  - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/taiga_frontend
 #  - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/taiga_celeryworker

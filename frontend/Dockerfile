@@ -18,7 +18,7 @@ RUN apt-get update \
     && tar -xzf ${TAIGA_VERSION}-stable.tar.gz -C ./ taiga-front-dist-${TAIGA_VERSION}-stable/ --strip-components=2 \
     && rm ${TAIGA_VERSION}-stable.tar.gz \
     && addgroup --gid 1000 taiga \
-    && adduser --uid 1000 --gid 1000 --disabled-login taiga \
+    && adduser --uid 1000 --gid 1000 --gecos "" --disabled-login taiga \
     && chmod 555 /scripts/entrypoint.sh \
     && rm -f /etc/nginx/sites-enabled/default \
     && mkdir -p /taiga_frontend/plugins/google-auth/images /taiga_frontend/plugins/gitlab-auth/images \

@@ -57,6 +57,8 @@ EVENTS_PUSH_BACKEND_OPTIONS = {"url": "amqp://%s:%s@%s:5672/%s" % (env("RABBITMQ
 # see celery_local.py
 CELERY_ENABLED = True
 
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', cast=str, default='anonymous@example.com')):
+
 if len(env('TAIGA_BACKUP_DIR', cast=str, default='')):
     print("Enable backup")
     INSTALLED_APPS += ["dbbackup"]

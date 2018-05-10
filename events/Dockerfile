@@ -14,7 +14,7 @@ RUN tar -xzf ${TAIGA_VERSION}.tar.gz -C ./ taiga-events-master/ --strip-componen
     && rm ${TAIGA_VERSION}.tar.gz \
     && npm i npm@latest -g \
     && npm install --production && npm install -g coffee-script \
-    && addgroup -S taiga && adduser --gecos "" -S -G taiga taiga \
+    && addgroup -S taiga && adduser -S -G taiga taiga \
     && chown -R taiga /taiga_events \
     && chown -R taiga /scripts/ \
     && chmod +x /scripts/entrypoint.sh

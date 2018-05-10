@@ -57,7 +57,16 @@ EVENTS_PUSH_BACKEND_OPTIONS = {"url": "amqp://%s:%s@%s:5672/%s" % (env("RABBITMQ
 # see celery_local.py
 CELERY_ENABLED = True
 
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', cast=str, default='anonymous@example.com')):
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', cast=str, default='anonymous@example.com')
+EMAIL_USE_TLS = env('EMAIL_USE_TLS', cast=bool, default=True)
+EMAIL_HOST = env('EMAIL_HOST', cast=str, default = '127.0.0.1')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', cast=str, default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', cast=str, default='')
+EMAIL_PORT = env('EMAIL_PORT', cast=int, default=587)
+EMAIL_SUBJECT_PREFIX='[taiga] '
+
 
 if len(env('TAIGA_BACKUP_DIR', cast=str, default='')):
     print("Enable backup")
@@ -133,7 +142,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'WARNING',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         }
@@ -141,11 +150,15 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'WARNING',
             'propagate': True,
         },
     }
 }
+
+if (DEBUG):
+    LOGGING['handlers']['console']['level'] = 'DEBUG'
+    LOGGING['loggers']['django']['level'] = 'DEBUG'
 
 import logging, logging.config
 logging.config.dictConfig(LOGGING)

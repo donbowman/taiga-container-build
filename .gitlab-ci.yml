@@ -23,7 +23,9 @@ build:
   - pip install docker-compose
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
   - touch environment
+  - echo Build with TAIGA_CONTAINER_REGISTRY=$TAIGA_CONTAINER_REGISTRY
   - docker-compose build
+  - docker images
   - docker-compose push
 #  - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/taiga_backend
 #  - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/taiga_frontend

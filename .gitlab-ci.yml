@@ -20,12 +20,20 @@ services:
 build:
   stage: build
   script:
-  - echo Start build
-  - touch environment
-  - echo Build with TAIGA_CONTAINER_REGISTRY=$TAIGA_CONTAINER_REGISTRY
-  - docker-compose build
-  - docker images
-  - docker-compose push
+    - echo Start build
+    - touch environment
+    - echo Build with TAIGA_CONTAINER_REGISTRY=$TAIGA_CONTAINER_REGISTRY
+    - docker-compose build
+    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF
+    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF
+    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF
+    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF
+    - docker images
+    - docker-compose push
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF
 
 scan:
   stage: scan
@@ -49,6 +57,19 @@ scan:
     - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF || true
     - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF || true
     - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF || true
+
+Pushing backend (cr.agilicus.com/corp-tools/taiga-container-build/taiga_backend:latest)...
+The push refers to repository [cr.agilicus.com/corp-tools/taiga-container-build/taiga_backend]
+latest: digest: sha256:1482199394e037ba96d1a8e4c40515fa781e14de88ead321134af5a00ff09498 size: 2611
+Pushing celeryworker (cr.agilicus.com/corp-tools/taiga-container-build/taiga_celeryworker:latest)...
+The push refers to repository [cr.agilicus.com/corp-tools/taiga-container-build/taiga_celeryworker]
+latest: digest: sha256:1482199394e037ba96d1a8e4c40515fa781e14de88ead321134af5a00ff09498 size: 2611
+Pushing events (cr.agilicus.com/corp-tools/taiga-container-build/taiga_events:latest)...
+The push refers to repository [cr.agilicus.com/corp-tools/taiga-container-build/taiga_events]
+latest: digest: sha256:095114ad775f9b57d4bc618952ea7ba78746d5641a36c27c76c261a7236b2a94 size: 1785
+Pushing frontend (cr.agilicus.com/corp-tools/taiga-container-build/taiga_frontend:latest)...
+The push refers to repository [cr.agilicus.com/corp-tools/taiga-container-build/taiga_frontend]
+latest: digest: sha256:25128e1829643825b3ae78dd8e2acee232a9a1d13baf6722272609fb1dc2a8d8 size: 2401
 
 test:
   stage: test

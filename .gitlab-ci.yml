@@ -42,11 +42,14 @@ scan:
     paths:
       - reports/
   script:
-    - echo Analyse container for vulnerability
-    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF
-    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF
-    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF
-    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF
+    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF for vulnerability
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF || true
+    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF for vulnerability
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF || true
+    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF for vulnerability
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF || true
+    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF for vulnerability
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF || true
     - echo Generate JSON report
     - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF || true
     - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF || true

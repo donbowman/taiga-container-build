@@ -1,4 +1,12 @@
-image: docker:stable
+image: cr.agilicus.com/corp-tools/docker-compose
+
+stages:
+  - build
+  - scan
+  - test
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -9,25 +17,40 @@ variables:
 services:
 - name: docker:dind
 
-# We cannot do this, since the image is MUSL-based
-#  - wget -O /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.21.2/docker-compose-Linux-x86_64
-#  - echo "8a11713e11ed73abcb3feb88cd8b5674b3320ba33b22b2ba37915b4ecffdf042  docker-compose" > /usr/local/bin/docker-compose.sha256sum
-#  - (cd /usr/local/bin; sha256sum -c docker-compose.sha256sum)
-#  - chmod 555 /usr/local/bin/docker-compose
 build:
   stage: build
   script:
   - echo Start build
-  - apk update
-  - apk add py-pip
-  - pip install docker-compose
-  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
   - touch environment
   - echo Build with TAIGA_CONTAINER_REGISTRY=$TAIGA_CONTAINER_REGISTRY
   - docker-compose build
   - docker images
   - docker-compose push
-#  - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/taiga_backend
-#  - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/taiga_frontend
-#  - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/taiga_celeryworker
-#  - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/taiga_events
+
+scan:
+  stage: scan
+  artifacts:
+    name: "$CI_PROJECT_PATH-$CI_COMMIT_REF_NAME"
+    paths:
+      - reports/
+  script:
+    - echo Analyse container for vulnerability
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF
+    - echo Generate JSON report
+    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF || true
+    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF || true
+    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF || true
+    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF || true
+    - echo Generate HTML report
+    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF || true
+    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF || true
+    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF || true
+    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF || true
+
+test:
+  stage: test
+  script:
+    - echo Start unit-test

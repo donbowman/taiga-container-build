@@ -1,6 +1,6 @@
 FROM node:alpine
 
-LABEL MAINTAINER="db@donbowman.ca"
+LABEL MAINTAINER="don@agilicus.com"
 LABEL taiga_version="branch:master"
 
 ENV TAIGA_VERSION master

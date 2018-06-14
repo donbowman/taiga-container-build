@@ -1,5 +1,17 @@
 image: cr.agilicus.com/corp-tools/docker-compose
 
+variables:
+  DOCKER_DRIVER: overlay2
+  PORT: 2375
+  DOCKER_HOST: tcp://localhost:2375
+  CONTAINER_IMAGE: $CI_REGISTRY/$CI_PROJECT_PATH
+  HANGOUTS_SPACE: AAAAqAYKghI
+  HANGOUTS_KEY: AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=kH8cc_W44ZzioakoUkFWkwSssem-9xH9K1r_0hWjuS4
+  HANGOUTS_TOKEN: kH8cc_W44ZzioakoUkFWkwSssem-9xH9K1r_0hWjuS4
+  HANGOUTS_THREAD: $CI_PROJECT_PATH
+  HANGOUTS_MSG: $GITLAB_USER_LOGIN::$CI_JOB_STAGE $CI_PROJECT_PATH -- see $CI_PROJECT_URL/-/jobs/$CI_BUILD_ID\n$GIT_COMMIT_TITLE
+  TAIGA_CONTAINER_REGISTRY: $CI_REGISTRY/$CI_PROJECT_PATH/
+
 stages:
   - build
   - scan
@@ -7,12 +19,9 @@ stages:
 
 before_script:
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-
-variables:
-  DOCKER_DRIVER: overlay2
-  PORT: 2375
-  DOCKER_HOST: tcp://localhost:2375
-  TAIGA_CONTAINER_REGISTRY: $CI_REGISTRY/$CI_PROJECT_PATH/
+  - "curl -X POST -H 'Content-Type: application/json'
+    \"https://chat.googleapis.com/v1/spaces/$HANGOUTS_SPACE/messages?key=$HANGOUTS_KEY&token=$HANGOUTS_TOKEN&threadKey=$HANGOUTS_THREAD\"
+    -d \"{\\\"text\\\":\\\"$HANGOUTS_MSG\\\"}\""
 
 services:
   - name: docker:dind

@@ -5,11 +5,6 @@ variables:
   PORT: 2375
   DOCKER_HOST: tcp://localhost:2375
   CONTAINER_IMAGE: $CI_REGISTRY/$CI_PROJECT_PATH
-  HANGOUTS_SPACE: AAAAqAYKghI
-  HANGOUTS_KEY: AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=kH8cc_W44ZzioakoUkFWkwSssem-9xH9K1r_0hWjuS4
-  HANGOUTS_TOKEN: kH8cc_W44ZzioakoUkFWkwSssem-9xH9K1r_0hWjuS4
-  HANGOUTS_THREAD: $CI_PROJECT_PATH
-  HANGOUTS_MSG: $GITLAB_USER_LOGIN::$CI_JOB_STAGE $CI_PROJECT_PATH -- see $CI_PROJECT_URL/-/jobs/$CI_BUILD_ID\n$GIT_COMMIT_TITLE
   TAIGA_CONTAINER_REGISTRY: $CI_REGISTRY/$CI_PROJECT_PATH/
 
 stages:
@@ -19,9 +14,6 @@ stages:
 
 before_script:
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-  - "curl -X POST -H 'Content-Type: application/json'
-    \"https://chat.googleapis.com/v1/spaces/$HANGOUTS_SPACE/messages?key=$HANGOUTS_KEY&token=$HANGOUTS_TOKEN&threadKey=$HANGOUTS_THREAD\"
-    -d \"{\\\"text\\\":\\\"$HANGOUTS_MSG\\\"}\""
 
 services:
   - name: docker:dind
@@ -33,16 +25,16 @@ build:
     - touch environment
     - echo Build with TAIGA_CONTAINER_REGISTRY=$TAIGA_CONTAINER_REGISTRY
     - docker-compose build
-    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF
-    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF
-    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF
-    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF
+    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF_NAME
+    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF_NAME
+    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF_NAME
+    - docker tag $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:latest $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF_NAME
     - docker images
     - docker-compose push
-    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF
-    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF
-    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF
-    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF_NAME
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF_NAME
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF_NAME
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF_NAME
 
 scan:
   stage: scan
@@ -51,24 +43,24 @@ scan:
     paths:
       - reports/
   script:
-    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF for vulnerability
-    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF || true
-    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF for vulnerability
-    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF || true
-    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF for vulnerability
-    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF || true
-    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF for vulnerability
-    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF || true
+    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF_NAME for vulnerability
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF_NAME || true
+    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF_NAME for vulnerability
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF_NAME || true
+    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF_NAME for vulnerability
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF_NAME || true
+    - echo Analyse $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF_NAME for vulnerability
+    - clairctl analyze --log-level debug $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF_NAME || true
     - echo Generate JSON report
-    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF || true
-    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF || true
-    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF || true
-    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF || true
+    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF_NAME || true
+    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF_NAME || true
+    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF_NAME || true
+    - clairctl report -f json $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF_NAME || true
     - echo Generate HTML report
-    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF || true
-    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF || true
-    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF || true
-    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF || true
+    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_backend:$CI_BUILD_REF_NAME || true
+    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_frontend:$CI_BUILD_REF_NAME || true
+    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_events:$CI_BUILD_REF_NAME || true
+    - clairctl report -f html $CI_REGISTRY/$CI_PROJECT_PATH/taiga_celeryworker:$CI_BUILD_REF_NAME || true
 
 test:
   stage: test

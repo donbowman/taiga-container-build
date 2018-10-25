@@ -14,10 +14,10 @@ COPY scripts/ /scripts/
 # https://github.com/psycopg/psycopg2-wheels/issues/2
 # RUN sed -i 's?CairoSVG=?CairoSVG>?' requirements.txt
 RUN apt-get update \
-    && apt-get --yes install python3 build-essential libssl-dev \
+    && apt-get --yes --no-install-recommends install python3 build-essential libssl-dev \
        libfreetype6-dev libjpeg8-dev libwebp-dev libtiff5-dev libpng-dev liblcms2-2 \
        libopenjp2-7-dev zlib1g-dev libxslt1-dev libxml2-dev libffi-dev libpq-dev git \
-       python3-pip postgresql-client gettext curl \
+       python3-pip postgresql-client gettext curl python3-setuptools python3-wheel libpython3.6-dev \
     && tar -xzf ${TAIGA_VERSION}.tar.gz -C ./ taiga-back-${TAIGA_VERSION} --strip-components=1 \
     && rm ${TAIGA_VERSION}.tar.gz \
     && sed -i 's,git+https://github.com/Xof/django-pglocks.git,django-pglocks==1.0.2,g' requirements.txt \

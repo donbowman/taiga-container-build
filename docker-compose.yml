@@ -8,7 +8,7 @@ volumes:
 services:
 
   postgresql:
-    image: postgres:10-alpine
+    image: postgres:11-alpine
     hostname: postgresql
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -17,13 +17,13 @@ services:
       - environment
 
   redis:
-    image: redis:4.0-alpine
+    image: redis:5-alpine
     hostname: rabbitmq
     env_file:
       - environment
 
   rabbitmq:
-    image: rabbitmq:3.6-alpine
+    image: rabbitmq:3-alpine
     hostname: rabbitmq
     env_file:
       - environment

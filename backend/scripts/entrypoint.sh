@@ -59,7 +59,7 @@ pmc() {
             sleep $ts
             python3 manage.py dbbackup -z
             python3 manage.py mediabackup -z
-            PGPASSWORD=$POSTGRES_PASSWORD pg_dump --host taiga-postgresql -U taiga -Fc > /var/backups/taiga/db-$(date -Is).pgdump
+            PGPASSWORD=$POSTGRES_PASSWORD pg_dump --host taiga-postgresql -U taiga -Fc > $TAIGA_BACKUP_DIR/db-$(date -Is).pgdump
 
             # Now sleep less than 1 day and let above catch it up
             nd=86000

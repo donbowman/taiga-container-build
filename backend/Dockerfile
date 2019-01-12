@@ -1,8 +1,8 @@
 FROM ubuntu:18.04 as builder
 LABEL MAINTAINER="don@agilicus.com"
-LABEL taiga_version="tag:3.4.0"
+LABEL taiga_version="tag:4.0.3"
 
-ENV TAIGA_VERSION 3.4.0
+ENV TAIGA_VERSION 4.0.3
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG http_proxy
@@ -27,12 +27,10 @@ RUN apt-get update \
     && echo "taiga-contrib-gitlab-auth-official>=3.1.1" >> requirements.txt \
     && echo "django-dbbackup" >> requirements.txt \
     && echo "django-cron" >> requirements.txt \
-    && sed -i -e 's?gunicorn==19.7.1?gunicorn==19.8.1?g' requirements.txt \
-    && sed -i -e 's?celery==4.0.2?celery==4.2.0rc4?g' requirements.txt \
+    && sed -i -e 's?gunicorn==19.7.1?gunicorn==19.9.0?g' requirements.txt \
+    && sed -i -e 's?celery==4.0.2?celery==4.2.1?g' requirements.txt \
     && sed -i -e 's?kombu==4.0.2?kombu==4.2.1?g' requirements.txt \
     && pip3 --proxy=$http_proxy install -r requirements.txt \
-    && pip3 uninstall -y psycopg2 \
-    && pip3 --proxy=$http_proxy install --no-binary :all: psycopg2==2.7.1 \
     && python3 manage.py compilemessages \
     && git clone https://github.com/donbowman/taiga-contrib-google-auth.git \
     && cd taiga-contrib-google-auth/back \

@@ -22,14 +22,14 @@ RUN apt-get update \
     && rm ${TAIGA_VERSION}.tar.gz \
     && sed -i 's,git+https://github.com/Xof/django-pglocks.git,django-pglocks==1.0.2,g' requirements.txt \
     && echo "django-environ==0.4.0" >> requirements.txt \
-    && echo "gevent==1.1.2" >> requirements.txt \
+    && echo "gevent>=1.4.0" >> requirements.txt \
     && echo "django-anymail==0.5" >> requirements.txt \
     && echo "taiga-contrib-gitlab-auth-official>=3.1.1" >> requirements.txt \
     && echo "django-dbbackup" >> requirements.txt \
     && echo "django-cron" >> requirements.txt \
     && sed -i -e 's?gunicorn==19.7.1?gunicorn==19.9.0?g' requirements.txt \
     && sed -i -e 's?celery==4.0.2?celery==4.2.1?g' requirements.txt \
-    && sed -i -e 's?kombu==4.0.2?kombu==4.2.1?g' requirements.txt \
+    && sed -i -e 's?kombu==4.0.2?kombu>=4.2.1?g' requirements.txt \
     && pip3 --proxy=$http_proxy install -r requirements.txt \
     && python3 manage.py compilemessages \
     && git clone https://github.com/donbowman/taiga-contrib-google-auth.git \

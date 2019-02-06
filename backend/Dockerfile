@@ -1,8 +1,8 @@
 FROM ubuntu:18.04 as builder
 LABEL MAINTAINER="don@agilicus.com"
-LABEL taiga_version="tag:4.0.3"
+LABEL taiga_version="tag:4.1.0"
 
-ENV TAIGA_VERSION 4.0.3
+ENV TAIGA_VERSION 4.1.0
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG http_proxy
